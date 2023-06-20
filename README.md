@@ -33,3 +33,15 @@ Modifying the GET request to `GET /index.phps HTTP/1.1` allowed me to view the s
 3.  If the $perm variable is set and the user is an admin, the user is presented with _"Welcome admin"_.
 4.  An instance of the access_log class is created with the log file path `access.log`.
 5.  Otherwise, if the user has been identified as a guest, they are presented with _"Welcome guest"_.
+
+## Exploitation
+
+To reveal the contents of the file containing the flag, a deserialisation error must occur. 
+
+Using lines 5 to 26 of the `authentication.php` file, we can echo a serialised instance of the access_log class with the $log_file property set to `../flag`, allowing us to move up a directory and access the flag file of the parent directory in the server's file system. The output received from the echo command:  `O:10:"access_log":1:{s:8:"log_file";s:7:"../flag";}` is then base64 encoded: `TzoxMDoiYWNjZXNzX2xvZyI6MTp7czo4OiJsb2dfZmlsZSI7czo3OiIuLi9mbGFnIjt9`. 
+
+![image](https://github.com/KayEm06/insecure-deserialisation/assets/62169414/364b83b3-0f97-4124-a24d-76e58d0c85a4)
+
+We can specify a new `login` cookie with the value of the base64 encoded serial in the HTTP GET request to `/authentication.php`. Once run, a deserialisation error will occur and the flag will be outputted.
+
+
